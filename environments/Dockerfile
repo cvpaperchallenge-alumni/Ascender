@@ -8,12 +8,16 @@ ARG UID=1000
 ARG GID=1000
 ARG PYTHON_VERSION=3.12
 ARG APPLICATION_DIRECTORY=/home/${USER_NAME}/${PROJECT_NAME}
+ARG UV_TOOL_BIN_DIRECTORY=/home/${USER_NAME}/.local/bin/
 ARG RUN_POETRY_INSTALL_AT_BUILD_TIME="false"
 
+# To use uv tools, UV_TOOL_BIN_DIRECTORY must be added to PATH.
 ENV DEBIAN_FRONTEND="noninteractive" \
     LC_ALL="C.UTF-8" \
     LANG="C.UTF-8" \
-    PYTHONPATH=${APPLICATION_DIRECTORY}
+    PYTHONPATH=${APPLICATION_DIRECTORY} \
+	UV_TOOL_BIN_DIR=${UV_TOOL_BIN_DIRECTORY} \
+	PATH=${UV_TOOL_BIN_DIRECTORY}:${PATH}
 
 RUN apt update -y && apt install --no-install-recommends -y software-properties-common \
     # Add deadsnakes PPA to install older Python versions
@@ -35,7 +39,7 @@ RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python${PYTHON_VERSION}
 
 # Install Poethepoet directly using pip to type "poe" command without "poetry run".
 RUN python3 -m pip install --upgrade pip setuptools requests wheel six urllib3 \
-    && python3 -m pip install poetry poethepoet
+    && python3 -m pip install uv poethepoet
 
 # Add user. Without this, following process is executed as admin.
 RUN groupadd -g ${GID} ${GROUP_NAME} \
@@ -46,6 +50,10 @@ WORKDIR ${APPLICATION_DIRECTORY}
 
 # If ${RUN_POETRY_INSTALL_AT_BUILD_TIME} = "true", install Python package by Poetry and move .venv under ${HOME}.
 # This process is for CI (GitHub Actions). To prevent overwrite by volume of docker compose, .venv is moved under ${HOME}.
-COPY --chown=${UID}:${GID} pyproject.toml poetry.lock poetry.toml ./
-RUN test ${RUN_POETRY_INSTALL_AT_BUILD_TIME} = "true" && poetry install || echo "skip to run poetry install."
-RUN test ${RUN_POETRY_INSTALL_AT_BUILD_TIME} = "true" && mv ${APPLICATION_DIRECTORY}/.venv ${HOME}/.venv || echo "skip to move .venv."
+COPY --chown=${UID}:${GID} pyproject.toml uv.lock  ./
+RUN uv tool install ruff \
+	&& uv tool install mypy \
+	&& uv tool install pytest --with pytest-cov \
+	&& uv tool install mdformat --with mdformat-frontmatter --with mdformat-gfm --with mdformat-footnote
+# RUN test ${RUN_POETRY_INSTALL_AT_BUILD_TIME} = "true" && poetry install || echo "skip to run poetry install."
+# RUN test ${RUN_POETRY_INSTALL_AT_BUILD_TIME} = "true" && mv ${APPLICATION_DIRECTORY}/.venv ${HOME}/.venv || echo "skip to move .venv."
