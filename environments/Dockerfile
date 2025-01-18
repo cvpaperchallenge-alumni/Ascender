@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=ubuntu:20.04
+ARG BASE_IMAGE=ubuntu:22.04
 FROM ${BASE_IMAGE}
 
 ARG PROJECT_NAME=ascender
@@ -9,7 +9,7 @@ ARG GID=1000
 ARG PYTHON_VERSION=3.12
 ARG APPLICATION_DIRECTORY=/home/${USER_NAME}/${PROJECT_NAME}
 ARG UV_TOOL_BIN_DIRECTORY=/home/${USER_NAME}/.local/bin/
-ARG RUN_POETRY_INSTALL_AT_BUILD_TIME="false"
+ARG RUN_UV_SYNC_AT_BUILD_TIME="false"
 
 # To use uv tools, UV_TOOL_BIN_DIRECTORY must be added to PATH.
 ENV DEBIAN_FRONTEND="noninteractive" \
@@ -19,7 +19,7 @@ ENV DEBIAN_FRONTEND="noninteractive" \
 	UV_TOOL_BIN_DIR=${UV_TOOL_BIN_DIRECTORY} \
 	PATH=${UV_TOOL_BIN_DIRECTORY}:${PATH}
 
-RUN apt update -y && apt install --no-install-recommends -y software-properties-common \
+RUN apt update -y && apt install --no-install-recommends -y software-properties-common gpg-agent \
     # Add deadsnakes PPA to install older Python versions
     && add-apt-repository ppa:deadsnakes/ppa \
     && apt-get update && apt-get install -y \
@@ -37,7 +37,7 @@ RUN update-alternatives --install /usr/bin/python python /usr/bin/python${PYTHON
 # Install pip for specified Python version
 RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python${PYTHON_VERSION}
 
-# Install Poethepoet directly using pip to type "poe" command without "poetry run".
+# Install Poethepoet directly using pip to type "poe" command without "uv run".
 RUN python3 -m pip install --upgrade pip setuptools requests wheel six urllib3 \
     && python3 -m pip install uv poethepoet
 
@@ -48,12 +48,12 @@ RUN groupadd -g ${GID} ${GROUP_NAME} \
 USER ${USER_NAME}
 WORKDIR ${APPLICATION_DIRECTORY}
 
-# If ${RUN_POETRY_INSTALL_AT_BUILD_TIME} = "true", install Python package by Poetry and move .venv under ${HOME}.
+# If ${RUN_UV_SYNC_AT_BUILD_TIME} = "true", install Python package by uv and move .venv under ${HOME}.
 # This process is for CI (GitHub Actions). To prevent overwrite by volume of docker compose, .venv is moved under ${HOME}.
 COPY --chown=${UID}:${GID} pyproject.toml uv.lock  ./
 RUN uv tool install ruff \
 	&& uv tool install mypy \
 	&& uv tool install pytest --with pytest-cov \
 	&& uv tool install mdformat --with mdformat-frontmatter --with mdformat-gfm --with mdformat-footnote
-# RUN test ${RUN_POETRY_INSTALL_AT_BUILD_TIME} = "true" && poetry install || echo "skip to run poetry install."
-# RUN test ${RUN_POETRY_INSTALL_AT_BUILD_TIME} = "true" && mv ${APPLICATION_DIRECTORY}/.venv ${HOME}/.venv || echo "skip to move .venv."
+RUN test ${RUN_UV_SYNC_AT_BUILD_TIME} = "true" && uv sync || echo "skip to run uv sync."
+RUN test ${RUN_UV_SYNC_AT_BUILD_TIME} = "true" && mv ${APPLICATION_DIRECTORY}/.venv ${HOME}/.venv || echo "skip to move .venv."
