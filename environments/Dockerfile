@@ -9,6 +9,7 @@ ARG GID=1000
 ARG PYTHON_VERSION=3.12
 ARG APPLICATION_DIRECTORY=/home/${USER_NAME}/${PROJECT_NAME}
 ARG UV_TOOL_BIN_DIRECTORY=/home/${USER_NAME}/.local/bin/
+ARG INSTALL_UV_TOOLS="true"
 ARG RUN_UV_SYNC_AT_BUILD_TIME="false"
 
 # To use uv tools, UV_TOOL_BIN_DIRECTORY must be added to PATH.
@@ -48,12 +49,15 @@ RUN groupadd -g ${GID} ${GROUP_NAME} \
 USER ${USER_NAME}
 WORKDIR ${APPLICATION_DIRECTORY}
 
+COPY --chown=${UID}:${GID} pyproject.toml uv.lock  ./
+RUN test ${INSTALL_UV_TOOLS} = "true" \
+&& uv tool install ruff \
+&& uv tool install mypy \
+&& uv tool install pytest --with pytest-cov \
+&& uv tool install mdformat --with mdformat-frontmatter --with mdformat-gfm --with mdformat-footnote \
+|| echo "skip to install uv tools."
+
 # If ${RUN_UV_SYNC_AT_BUILD_TIME} = "true", install Python package by uv and move .venv under ${HOME}.
 # This process is for CI (GitHub Actions). To prevent overwrite by volume of docker compose, .venv is moved under ${HOME}.
-COPY --chown=${UID}:${GID} pyproject.toml uv.lock  ./
-RUN uv tool install ruff \
-	&& uv tool install mypy \
-	&& uv tool install pytest --with pytest-cov \
-	&& uv tool install mdformat --with mdformat-frontmatter --with mdformat-gfm --with mdformat-footnote
 RUN test ${RUN_UV_SYNC_AT_BUILD_TIME} = "true" && uv sync || echo "skip to run uv sync."
 RUN test ${RUN_UV_SYNC_AT_BUILD_TIME} = "true" && mv ${APPLICATION_DIRECTORY}/.venv ${HOME}/.venv || echo "skip to move .venv."
