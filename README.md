@@ -4,6 +4,7 @@
 ![python versions](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-blue)
 [![tests](https://github.com/cvpaperchallenge/Ascender/actions/workflows/lint-and-test.yaml/badge.svg)](https://github.com/cvpaperchallenge/Ascender/actions/workflows/lint-and-test.yaml)
 [![MIT License](https://img.shields.io/github/license/cvpaperchallenge/Ascender?color=green)](LICENSE)
+[![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Typing: mypy](https://img.shields.io/badge/typing-mypy-blue)](https://github.com/python/mypy)
 [![DOI](https://zenodo.org/badge/466620310.svg)](https://zenodo.org/badge/latestdoi/466620310)
@@ -13,14 +14,12 @@
 Ascender (Accelerator of SCiENtific DEvelopment and Research) is a [GitHub repository template](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-template-repository) designed for research projects using Python. It incorporates several pre-implemented features to expedite development:
 
 - **Containerization**: Dependency minimization and code portability enhancement using [Docker](https://www.docker.com/).
-- **Virtual Environment / Package Management**: Development environment reproducibility ensured by [Poetry](https://python-poetry.org/).
+- **Virtual Environment / Package Management**: Development environment reproducibility ensured by [uv](https://github.com/astral-sh/uv).
 - **Coding Style**: Automatic code linting and formatting with [Ruff](https://docs.astral.sh/ruff/).
 - **Static Type Checking**: Early bug detection assisted by [Mypy](https://github.com/python/mypy).
 - **Testing**: Testing simplification achieved through [pytest](https://github.com/pytest-dev/pytest).
 - **Task Runner**: Simple task automation with [Poe the Poet](https://github.com/nat-n/poethepoet).
 - **GitHub Integration**: Integration features including [GitHub Actions workflows](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions), issue templates, and more.
-
-Please also view [resources about Ascender (in Japanese)](https://cvpaperchallenge.github.io/Britannica/ascender/ja).
 
 ## Project Organization
 
@@ -44,9 +43,8 @@ Please also view [resources about Ascender (in Japanese)](https://cvpaperchallen
     ├── .dockerignore
     ├── .gitignore
     ├── LICENSE
-    ├── poetry.lock            <- Auto-generated lock file (do not edit manually).
-    ├── poetry.toml            <- Poetry configuration.
     ├── pyproject.toml         <- Main project configuration file.
+    ├── uv.lock                <- Auto-generated lock file (do not edit manually).
     └── README.md              <- Top-level README for developers.
 ```
 
@@ -56,7 +54,7 @@ Please also view [resources about Ascender (in Japanese)](https://cvpaperchallen
 - [Docker Compose](https://github.com/docker/compose)
 - (Optional) [NVIDIA Container Toolkit (nvidia-docker2)](https://github.com/NVIDIA/nvidia-docker)
 
-> \[!Note\]
+> [!Note]
 > The example codes in the README.md are written for `Docker Compose v2`. However, Ascender is also compatible with `Docker Compose v1`. If you are using `Docker Compose v1`, simply replace `docker compose` with `docker-compose` in the example commands.
 
 ## Prerequisites Installation
@@ -138,7 +136,7 @@ Depending on the services, frameworks, and libraries used during development, it
   #   - ../envs.env # <- uncomment here
   ```
 
-> \[!Note\]
+> [!Note]
 > The `envs.env` file may contain sensitive information such as API keys and passwords and should not be version-controlled by Git. In Ascender, files named `*.env` are excluded from Git tracking by default, as they are listed in the `.gitignore` file.
 
 ### Start Development
@@ -155,8 +153,8 @@ $ sudo docker compose up -d
 # Enter the container shell
 $ sudo docker compose exec core bash
 
-# Set up the virtual environment and install dependencies with Poetry
-$ poetry install
+# Set up the virtual environment and install dependencies with uv
+$ uv sync 
 ```
 
 You are now ready to start developing with Ascender.
@@ -175,29 +173,29 @@ $ sudo docker compose stop
 
 While we recommend using Docker as described, you may encounter issues installing Docker due to permissions or other constraints.
 
-If you cannot use Docker, Ascender can be operated without it. Simply install Poetry on your computer and proceed as described in the "Start Development" section, omitting the Docker steps.
+If you cannot use Docker, Ascender can be operated without it. Simply install uv on your computer and proceed as described in the "Start Development" section, omitting the Docker steps.
 
 ```bash
-# Install Poetry
-$ pip3 install poetry
+# Install uv
+$ pip3 install uv
 
 # Clone the repository
 $ git clone git@github.com:<YOUR_USER_NAME>/<YOUR_REPO_NAME>.git
 $ cd <YOUR_REPO_NAME>
 
-# Set up the virtual environment and install dependencies with Poetry
-$ poetry install
+# Set up the virtual environment and install dependencies with uv
+$ uv sync
 ```
 
-> \[!Note\]
+> [!Note]
 > The CI jobs in Ascender's GitHub Actions workflows utilize a Dockerfile. Running without Docker may cause these jobs to fail, necessitating modifications to the Dockerfile or the deletion of the CI job (`.github/workflows/lint-and-test.yaml`).
 
-### Permission Errors When Running `poetry install`
+### Permission Errors When Running `uv sync`
 
-Sometimes, running `poetry install` may result in a permission error:
+Sometimes, running `uv sync` may result in a permission error:
 
 ```bash
-$ poetry install
+$ uv sync
 ...
 
 virtualenv: error: argument dest: the destination . is not write-able at /home/challenger/ascender
@@ -212,27 +210,13 @@ $ id -g $USER  # Check GID
 
 In Ascender, the default UID and GID are both '1000'. If your local PC's UID or GID differs from this, you'll need to adjust the 'UID' or 'GID' values in 'docker-compose.yaml' to match your local settings. Alternatively, if the 'HOST_UID' and 'HOST_GID' environment variables are set on your host PC, Ascender will use these values.
 
-### Compatibility Issues Between PyTorch and Poetry
+### Using with PyTorch
 
-> \[!Note\]
-> Now poetry 1.2 is used in Ascender. So this issue is expected to be solved.
-
-As of now, there is a known compatibility issue between PyTorch and Poetry, which the Poetry community is actively addressing. This issue is anticipated to be resolved in Poetry version 1.2.0. You can track progress and explore pre-releases of this version [here](https://github.com/python-poetry/poetry/releases/tag/1.2.0b3).
-
-We plan to integrate Poetry 1.2.0 into Ascender as soon as it becomes available. In the meantime, you may need to use workarounds detailed in [this issue](https://github.com/python-poetry/poetry/issues/4231).
-
-**Related GitHub Issues**
-
-- [https://github.com/python-poetry/poetry/issues/2339](https://github.com/python-poetry/poetry/issues/2339)
-- [https://github.com/python-poetry/poetry/issues/2543](https://github.com/python-poetry/poetry/issues/2543)
-- [https://github.com/python-poetry/poetry/issues/2613](https://github.com/python-poetry/poetry/issues/2613)
-- [https://github.com/python-poetry/poetry/issues/3855](https://github.com/python-poetry/poetry/issues/3855)
-- [https://github.com/python-poetry/poetry/issues/4231](https://github.com/python-poetry/poetry/issues/4231)
-- [https://github.com/python-poetry/poetry/issues/4704](https://github.com/python-poetry/poetry/issues/4704)
+In some cases, you may want to specify the index of PyTorch to install. To do this, modify the `pyproject.toml` file based on the instruction of the [uv documentation about PyTorch installation](https://docs.astral.sh/uv/guides/integration/pytorch/#using-uv-with-pytorch).
 
 ### Changing Python Versions for CI Jobs
 
-By default, Ascender's CI jobs run using Python 3.8 and 3.9. If you wish to target a different Python version, modify [the matrix in `.github/workflows/lint-and-test.yaml`](https://github.com/cvpaperchallenge/Ascender/blob/master/.github/workflows/lint-and-test.yaml#L18).
+By default, Ascender's CI jobs run using Python `3.8`, `3.9`, `3.10`, `3.11` and `3.12`. If you wish to target a different Python version, modify [the matrix in `.github/workflows/lint-and-test.yaml`](https://github.com/cvpaperchallenge/Ascender/blob/master/.github/workflows/lint-and-test.yaml#L18).
 
 ### Incorrect Reflection of Dockerfile Changes in Image Builds
 

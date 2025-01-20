@@ -40,7 +40,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /tmp/.buildx-cache/${{ matrix.python-version }}
-          key: buildx-${{ hashFiles(format('{0}/Dockerfile', env.DOCKER_FILE_DIRECTORY), format('{0}/docker-compose.yaml', env.DOCKER_COMPOSE_DIRECTORY), 'poetry.lock') }}
+          key: buildx-${{ hashFiles(format('{0}/Dockerfile', env.DOCKER_FILE_DIRECTORY), format('{0}/docker-compose.yaml', env.DOCKER_COMPOSE_DIRECTORY), 'uv.lock') }}
 
       # If build cache is found, use it to build the Docker image.
       # The build is carried out using the `bake` command from buildx, referencing the `docker-compose.yaml` for CI.

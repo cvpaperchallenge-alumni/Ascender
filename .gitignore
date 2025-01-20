@@ -5,6 +5,7 @@ __pycache__
 .coverage
 .mypy_cache
 .pytest_cache
+.ruff_cache
 .venv
 *.env
 !data/README.md
