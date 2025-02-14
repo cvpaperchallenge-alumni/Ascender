@@ -11,7 +11,7 @@ package = false
 python-preference = "only-system"
 
 [tool.mypy]
-python_version = 3.8
+python_version = 3.12
 # following setting is same as pysen
 # https://github.com/pfnet/pysen/blob/main/setup.cfg#L12
 check_untyped_defs = true
@@ -37,7 +37,7 @@ warn_unused_ignores = true
 
 [tool.ruff]
 line-length = 88
-target-version = "py38"
+target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "B", "I", "N", "D", "PT"]
