@@ -1,6 +1,6 @@
 # Ascender
 
-![stable](https://img.shields.io/badge/stable-v0.2.0-blue)
+![stable](https://img.shields.io/badge/stable-v0.3.0-blue)
 ![python versions](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-blue)
 [![tests](https://github.com/cvpaperchallenge/Ascender/actions/workflows/lint-and-test.yaml/badge.svg)](https://github.com/cvpaperchallenge/Ascender/actions/workflows/lint-and-test.yaml)
 [![MIT License](https://img.shields.io/github/license/cvpaperchallenge/Ascender?color=green)](LICENSE)
