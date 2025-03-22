@@ -265,3 +265,7 @@ When using Ascender's templates for multiple projects, the following additional 
   # If you need to change the default name of the project, edit the following.
   PROJECT_NAME_ENV=ascender # Example: Change to a new project name
   ```
+
+### Why Ascender does NOT use uv tools?
+
+[Tools](https://docs.astral.sh/uv/concepts/tools/) are dedicated command-line interfaces for interacting with dev tools. However, as of March 2025, the functionality is not yet fully mature, and issues arise when calling plugin extensions; therefore, uv tools are not used in Ascender now.
