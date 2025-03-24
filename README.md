@@ -154,7 +154,10 @@ $ sudo docker compose up -d
 $ sudo docker compose exec core bash
 
 # Set up the virtual environment and install dependencies with uv
-$ uv sync 
+$ uv sync
+
+# Now you can run your Python code like follows
+$ uv run python src/<YOUR_PYTHON_CODE>.py
 ```
 
 You are now ready to start developing with Ascender.
@@ -168,6 +171,26 @@ $ sudo docker compose stop
 ```
 
 ## FAQ
+
+### Permission Errors When Running `uv sync`
+
+Sometimes, running `uv sync` may result in a permission error:
+
+```bash
+$ uv sync
+...
+
+virtualenv: error: argument dest: the destination . is not write-able at /home/challenger/ascender
+```
+
+If this occurs, check your local PC's UID (user ID) and GID (group ID) with the following commands:
+
+```bash
+$ id -u $USER  # Check UID
+$ id -g $USER  # Check GID
+```
+
+In Ascender, the default UID and GID are both '1000'. If your local PC's UID or GID differs from this, you'll need to adjust the 'UID' or 'GID' values in 'docker-compose.yaml' to match your local settings. Alternatively, if the 'HOST_UID' and 'HOST_GID' environment variables are set on your host PC, Ascender will use these values.
 
 ### Using Ascender Without Docker
 
@@ -189,26 +212,6 @@ $ uv sync
 
 > [!Note]
 > The CI jobs in Ascender's GitHub Actions workflows utilize a Dockerfile. Running without Docker may cause these jobs to fail, necessitating modifications to the Dockerfile or the deletion of the CI job (`.github/workflows/lint-and-test.yaml`).
-
-### Permission Errors When Running `uv sync`
-
-Sometimes, running `uv sync` may result in a permission error:
-
-```bash
-$ uv sync
-...
-
-virtualenv: error: argument dest: the destination . is not write-able at /home/challenger/ascender
-```
-
-If this occurs, check your local PC's UID (user ID) and GID (group ID) with the following commands:
-
-```bash
-$ id -u $USER  # Check UID
-$ id -g $USER  # Check GID
-```
-
-In Ascender, the default UID and GID are both '1000'. If your local PC's UID or GID differs from this, you'll need to adjust the 'UID' or 'GID' values in 'docker-compose.yaml' to match your local settings. Alternatively, if the 'HOST_UID' and 'HOST_GID' environment variables are set on your host PC, Ascender will use these values.
 
 ### Using with PyTorch
 
