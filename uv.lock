@@ -1,12 +1,7 @@
 version = 1
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 
 [[package]]
 name = "ascender"
 version = "0.3.0"
 source = { virtual = "." }
-
-[package.metadata]
-
-[package.metadata.requires-dev]
-dev = []

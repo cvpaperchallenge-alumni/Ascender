@@ -1,7 +1,7 @@
 # Ascender
 
 ![stable](https://img.shields.io/badge/stable-v0.3.0-blue)
-![python versions](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-blue)
+![python versions](https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-blue)
 [![tests](https://github.com/cvpaperchallenge/Ascender/actions/workflows/lint-and-test.yaml/badge.svg)](https://github.com/cvpaperchallenge/Ascender/actions/workflows/lint-and-test.yaml)
 [![MIT License](https://img.shields.io/github/license/cvpaperchallenge/Ascender?color=green)](LICENSE)
 [![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
@@ -219,7 +219,7 @@ In some cases, you may want to specify the index of PyTorch to install. To do th
 
 ### Changing Python Versions for CI Jobs
 
-By default, Ascender's CI jobs run using Python `3.8`, `3.9`, `3.10`, `3.11` and `3.12`. If you wish to target a different Python version, modify [the matrix in `.github/workflows/lint-and-test.yaml`](https://github.com/cvpaperchallenge/Ascender/blob/master/.github/workflows/lint-and-test.yaml#L18).
+By default, Ascender's CI jobs run using Python `3.9`, `3.10`, `3.11` and `3.12`. If you wish to target a different Python version, modify [the matrix in `.github/workflows/lint-and-test.yaml`](https://github.com/cvpaperchallenge/Ascender/blob/master/.github/workflows/lint-and-test.yaml#L18).
 
 ### Incorrect Reflection of Dockerfile Changes in Image Builds
 
