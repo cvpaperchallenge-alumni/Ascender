@@ -1,7 +1,7 @@
 # Ascender
 
 ![stable](https://img.shields.io/badge/stable-v0.3.0-blue)
-![python versions](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-blue)
+![python versions](https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-blue)
 [![tests](https://github.com/cvpaperchallenge/Ascender/actions/workflows/lint-and-test.yaml/badge.svg)](https://github.com/cvpaperchallenge/Ascender/actions/workflows/lint-and-test.yaml)
 [![MIT License](https://img.shields.io/github/license/cvpaperchallenge/Ascender?color=green)](LICENSE)
 [![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
@@ -154,7 +154,10 @@ $ sudo docker compose up -d
 $ sudo docker compose exec core bash
 
 # Set up the virtual environment and install dependencies with uv
-$ uv sync 
+$ uv sync
+
+# Now you can run your Python code like follows
+$ uv run python src/<YOUR_PYTHON_CODE>.py
 ```
 
 You are now ready to start developing with Ascender.
@@ -168,6 +171,26 @@ $ sudo docker compose stop
 ```
 
 ## FAQ
+
+### Permission Errors When Running `uv sync`
+
+Sometimes, running `uv sync` may result in a permission error:
+
+```bash
+$ uv sync
+...
+
+virtualenv: error: argument dest: the destination . is not write-able at /home/challenger/ascender
+```
+
+If this occurs, check your local PC's UID (user ID) and GID (group ID) with the following commands:
+
+```bash
+$ id -u $USER  # Check UID
+$ id -g $USER  # Check GID
+```
+
+In Ascender, the default UID and GID are both '1000'. If your local PC's UID or GID differs from this, you'll need to adjust the 'UID' or 'GID' values in 'docker-compose.yaml' to match your local settings. Alternatively, if the 'HOST_UID' and 'HOST_GID' environment variables are set on your host PC, Ascender will use these values.
 
 ### Using Ascender Without Docker
 
@@ -190,33 +213,13 @@ $ uv sync
 > [!Note]
 > The CI jobs in Ascender's GitHub Actions workflows utilize a Dockerfile. Running without Docker may cause these jobs to fail, necessitating modifications to the Dockerfile or the deletion of the CI job (`.github/workflows/lint-and-test.yaml`).
 
-### Permission Errors When Running `uv sync`
-
-Sometimes, running `uv sync` may result in a permission error:
-
-```bash
-$ uv sync
-...
-
-virtualenv: error: argument dest: the destination . is not write-able at /home/challenger/ascender
-```
-
-If this occurs, check your local PC's UID (user ID) and GID (group ID) with the following commands:
-
-```bash
-$ id -u $USER  # Check UID
-$ id -g $USER  # Check GID
-```
-
-In Ascender, the default UID and GID are both '1000'. If your local PC's UID or GID differs from this, you'll need to adjust the 'UID' or 'GID' values in 'docker-compose.yaml' to match your local settings. Alternatively, if the 'HOST_UID' and 'HOST_GID' environment variables are set on your host PC, Ascender will use these values.
-
 ### Using with PyTorch
 
 In some cases, you may want to specify the index of PyTorch to install. To do this, modify the `pyproject.toml` file based on the instruction of the [uv documentation about PyTorch installation](https://docs.astral.sh/uv/guides/integration/pytorch/#using-uv-with-pytorch).
 
 ### Changing Python Versions for CI Jobs
 
-By default, Ascender's CI jobs run using Python `3.8`, `3.9`, `3.10`, `3.11` and `3.12`. If you wish to target a different Python version, modify [the matrix in `.github/workflows/lint-and-test.yaml`](https://github.com/cvpaperchallenge/Ascender/blob/master/.github/workflows/lint-and-test.yaml#L18).
+By default, Ascender's CI jobs run using Python `3.9`, `3.10`, `3.11` and `3.12`. If you wish to target a different Python version, modify [the matrix in `.github/workflows/lint-and-test.yaml`](https://github.com/cvpaperchallenge/Ascender/blob/master/.github/workflows/lint-and-test.yaml#L18).
 
 ### Incorrect Reflection of Dockerfile Changes in Image Builds
 
